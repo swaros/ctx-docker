@@ -1,7 +1,9 @@
 task:
   - id: stop-all
     variables:
+      DCOLL: "ps"
       DCMD: "docker stop $DOCKERID"
+      BY_WHAT: "ID"
     next:
       - collect-runs
 
@@ -16,9 +18,12 @@ task:
       system: linux
       variables:
         DCMD: "*"
+        DCOLL: "*"
+        BY_WHAT: "*"
     script:      
       - | 
-       for DOCKERID in $(docker ps --format  '{{.ID}}')
-       do               
+       for DOCKERID in $(docker ${DCOLL} --format  '{{.${BY_WHAT}}}')
+       do     
+          echo "${DCMD}"  
           ${DCMD}
        done 
