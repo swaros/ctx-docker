@@ -1,0 +1,24 @@
+task:
+  - id: stop-all
+    variables:
+      DCMD: "docker stop $DOCKERID"
+    next:
+      - collect-runs
+
+  # tasks the needs to be done for any running container
+  # all of them based on the container id
+  #   docker ps --format  '{{json .ID}}'
+  - id: collect-runs
+    options:
+      invisible: true
+      displaycmd: true
+    require:
+      system: linux
+      variables:
+        DCMD: "*"
+    script:      
+      - | 
+       for DOCKERID in $(docker ps --format  '{{.ID}}')
+       do               
+          ${DCMD}
+       done 
