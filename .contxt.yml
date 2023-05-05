@@ -1,5 +1,9 @@
+config:
+  variables:
+    docker-tag: ""
+
 task:
-  - id: stop-all
+  - id: docker-stop-all
     variables:
       DCOLL: "ps"
       DCMD: "docker stop $DOCKERID"
@@ -26,4 +30,34 @@ task:
        do     
           echo "${DCMD}"  
           ${DCMD}
-       done 
+       done
+
+  - id: docker-show-ip
+    require:
+      system: linux
+      variables:
+        docker-tag: "*"
+    script:
+      - "#@var docker-ip-address docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${docker-tag}"
+      - echo "IP [${docker-ip-address}]"
+
+  - id: docker-show-ip
+    require:
+      system: linux
+      variables:
+        docker-tag: ""
+    script:
+      - echo "you need to set the docker-tag variable to the container name or id"
+      - echo "   ctx run -v docker-tag=container-name"
+      - echo "-------------------------------------------"
+      - docker ps --format '{{ .Names}}'
+      - echo "-------------------------------------------"
+      - echo "here all ips of running containers"
+      - echo "-------------------------------------------"
+      - |
+       for DOCKERID in $(docker ps --format  '{{.Names}}')
+       do
+          IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $DOCKERID)
+          echo -e "ip: $IP \t name: $DOCKERID"
+       done
+      - echo "-------------------------------------------"
