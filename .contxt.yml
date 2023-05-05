@@ -58,6 +58,7 @@ task:
        for DOCKERID in $(docker ps --format  '{{.Names}}')
        do
           IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $DOCKERID)
-          echo -e "ip: $IP \t name: $DOCKERID"
+          echo -e " === ip $IP \t name: $DOCKERID"
+          docker port $DOCKERID
        done
       - echo "-------------------------------------------"
